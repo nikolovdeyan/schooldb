@@ -1,7 +1,7 @@
 -- ==========================================================
 -- Author: Deyan Nikolov
 -- Date: 2023-11-10
--- Version: 1.1
+-- Version: 1.2
 -- Desc: Database script for an imaginary school data system
 -- ==========================================================
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS tbl_parent (
 CREATE TABLE IF NOT EXISTS tbl_class(
   class_id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(10) NOT NULL COMMENT 'Име на клас',
-  teacher_id INT(10) NOT NULL COMMENT 'Класен ръководител'
+  teacher_id INT(10) NOT NULL COMMENT 'Класен ръководител',
   CONSTRAINT fk_class_teacher FOREIGN KEY (teacher_id) REFERENCES tbl_teacher (teacher_id)
 )
 ENGINE = InnoDB
@@ -61,7 +61,8 @@ CREATE TABLE IF NOT EXISTS tbl_student (
   mname VARCHAR(50) NULL COMMENT 'Презиме на ученик',
   lname VARCHAR(50) NOT NULL COMMENT 'Фамилия на ученик',
   egn CHAR(10) NULL COMMENT 'ЕГН на ученик',
-  class_id INT(10)
+  class_id INT(10),
+  CONSTRAINT fk_student_class FOREIGN KEY (class_id) REFERENCES tbl_class (class_id)
 )
 ENGINE = InnoDB
 COMMENT 'Таблица с данни за ученици';
