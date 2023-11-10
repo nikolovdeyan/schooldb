@@ -1,7 +1,7 @@
 -- ==========================================================
 -- Author: Deyan Nikolov
 -- Date: 2023-11-10
--- Version: 1.2
+-- Version: 1.3
 -- Desc: Database script for an imaginary school data system
 -- ==========================================================
 
@@ -83,6 +83,52 @@ COMMENT 'Таблица-мост ученици-родители';
 
 
 -- ----------------------------------------------------------
+-- Table Schedule
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tbl_schedule (
+  schedule_id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  schedule_datetime DATETIME NULL COMMENT 'Начало на занятието',
+  class_id INT(10) NOT NULL COMMENT 'Клас, с който се провежда занятието',
+  subject VARCHAR(50) NULL COMMENT 'Предмет на занятието',
+  teacher_id INT(10) NOT NULL COMMENT 'Учител, водещ занятието',
+  CONSTRAINT fk_schedule_class FOREIGN KEY (class_id) REFERENCES tbl_class (class_id),
+  CONSTRAINT fk_schedule_teacher FOREIGN KEY (teacher_id) REFERENCES tbl_teacher (teacher_id)
+)
+ENGINE = InnoDB
+COMMENT 'Таблица с учебна програма';
+
+
+-- ----------------------------------------------------------
+-- Table Absence
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tbl_absence (
+  absence_id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  schedule_id INT(10) NOT NULL COMMENT 'Занятие, в което е настъпило отсъствието',
+  student_id INT(10) NOT NULL COMMENT 'Ученик, който е отсъствал',
+  notes VARCHAR(100) NULL COMMENT 'Допълнителна информация',
+  CONSTRAINT fk_absence_schedule FOREIGN KEY (schedule_id) REFERENCES tbl_schedule (schedule_id),
+  CONSTRAINT fk_absence_student FOREIGN KEY (student_id) REFERENCES tbl_students (student_id)
+)
+ENGINE = InnoDB
+COMMENT 'Таблица с отсъствия';
+
+-- ----------------------------------------------------------
+-- Table Grade
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tbl_grade (
+  grade_id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  schedule_id INT(10) NOT NULL COMMENT 'Занятие, в което е настъпило оценяването',
+  student_id INT(10) NOT NULL COMMENT 'Ученик, който е оценен',
+  grade DECIMAL(2,1) NOT NULL COMMENT 'Оценка',
+  notes VARCHAR(100) NULL COMMENT 'Допълнителна информация',
+  CONSTRAINT fk_grade_schedule FOREIGN KEY (schedule_id) REFERENCES tbl_schedule (schedule_id),
+  CONSTRAINT fk_grade_student FOREIGN KEY (student_id) REFERENCES tbl_students (student_id);
+)
+ENGINE = InnoDB
+COMMENT 'Таблица с оценки';
+
+
+-- ----------------------------------------------------------
 -- Sample data
 -- ----------------------------------------------------------
 
@@ -108,3 +154,16 @@ INSERT INTO tbl_studentparent (student_id, parent_id)
 VALUES (1, 1),
        (1, 2),
        (2, 3);
+
+INSERT INTO tbl_schedule (schedule_date, schedule_time, class_id, subject, teacher_id)
+VALUES ('2023-10-01 08:00:00', 1, 'Английски език', 1),
+       ('2023-10-01 09:00:00', 1, 'Математика', 2)
+       ('2023-10-01 10:00:00', 1, 'История', 3);
+
+INSERT INTO tbl_absence(schedule_id, student_id, notes)
+VALUES (1, 1, Null),
+       (2, 1, 'Ученикът е болен');
+
+INSERT INTO tbl_grades(schedule_id, student_id, grade, notes)
+VALUES (1, 2, 5.5, 'Контролно'),
+       (2, 1, 2, Null);
