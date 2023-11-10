@@ -1,7 +1,7 @@
 -- ==========================================================
 -- Author: Deyan Nikolov
 -- Date: 2023-11-10
--- Version: 1.3
+-- Version: 1.4
 -- Desc: Database script for an imaginary school data system
 -- ==========================================================
 
@@ -107,10 +107,11 @@ CREATE TABLE IF NOT EXISTS tbl_absence (
   student_id INT(10) NOT NULL COMMENT 'Ученик, който е отсъствал',
   notes VARCHAR(100) NULL COMMENT 'Допълнителна информация',
   CONSTRAINT fk_absence_schedule FOREIGN KEY (schedule_id) REFERENCES tbl_schedule (schedule_id),
-  CONSTRAINT fk_absence_student FOREIGN KEY (student_id) REFERENCES tbl_students (student_id)
+  CONSTRAINT fk_absence_student FOREIGN KEY (student_id) REFERENCES tbl_student (student_id)
 )
 ENGINE = InnoDB
 COMMENT 'Таблица с отсъствия';
+
 
 -- ----------------------------------------------------------
 -- Table Grade
@@ -122,10 +123,25 @@ CREATE TABLE IF NOT EXISTS tbl_grade (
   grade DECIMAL(2,1) NOT NULL COMMENT 'Оценка',
   notes VARCHAR(100) NULL COMMENT 'Допълнителна информация',
   CONSTRAINT fk_grade_schedule FOREIGN KEY (schedule_id) REFERENCES tbl_schedule (schedule_id),
-  CONSTRAINT fk_grade_student FOREIGN KEY (student_id) REFERENCES tbl_students (student_id);
+  CONSTRAINT fk_grade_student FOREIGN KEY (student_id) REFERENCES tbl_student (student_id)
 )
 ENGINE = InnoDB
 COMMENT 'Таблица с оценки';
+
+
+-- ----------------------------------------------------------
+-- Table WriteUp
+-- ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tbl_writeup (
+  writeup_id INT(10) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  schedule_id INT(10) NOT NULL COMMENT 'Занятие, в което е направена забележката',
+  student_id INT(10) NOT NULL COMMENT 'Ученик, на когото/ято е направена забележката',
+  contents VARCHAR(100) NOT NULL COMMENT 'Съдържание на забележката',
+  CONSTRAINT fk_writeup_schedule FOREIGN KEY (schedule_id) REFERENCES tbl_schedule (schedule_id),
+  CONSTRAINT fk_writeup_student FOREIGN KEY (student_id) REFERENCES tbl_students (student_id)
+)
+  ENGINE = InnoDB
+  COMMENT 'Таблица със забележки';
 
 
 -- ----------------------------------------------------------
@@ -155,15 +171,19 @@ VALUES (1, 1),
        (1, 2),
        (2, 3);
 
-INSERT INTO tbl_schedule (schedule_date, schedule_time, class_id, subject, teacher_id)
+INSERT INTO tbl_schedule (schedule_datetime, class_id, subject, teacher_id)
 VALUES ('2023-10-01 08:00:00', 1, 'Английски език', 1),
-       ('2023-10-01 09:00:00', 1, 'Математика', 2)
+       ('2023-10-01 09:00:00', 1, 'Математика', 2),
        ('2023-10-01 10:00:00', 1, 'История', 3);
 
 INSERT INTO tbl_absence(schedule_id, student_id, notes)
 VALUES (1, 1, Null),
        (2, 1, 'Ученикът е болен');
 
-INSERT INTO tbl_grades(schedule_id, student_id, grade, notes)
+INSERT INTO tbl_grade (schedule_id, student_id, grade, notes)
 VALUES (1, 2, 5.5, 'Контролно'),
        (2, 1, 2, Null);
+
+INSERT INTO tbl_writeup (schedule_id, student_id, contents)
+VALUES (1, 2, 'Не внимава в час'),
+       (2, 2, 'Говори в час');
